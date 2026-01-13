@@ -80,22 +80,51 @@ function ai(levelData, position, memory, isGrounded, velocity, tick, elapsedTime
 }
 ```
 
-### Goal-Seeking AI
+### Stuck-correction, goal-seeking, gap-skipping AI
 ```javascript
+function safeAccessGrid(levelData, x, y) {
+  return levelData.grid[Math.round(x)][Math.round(y)]
+}
+
+function dist(pos1, pos2) {
+  return Math.hypot(pos1.x-pos2.x, pos1.y-pos2.y)
+}
+
 function ai(levelData, position, memory, isGrounded, velocity, tick, elapsedTime) {
-    const goal = levelData.endPos;
-    const dx = goal.x - position.center.x;
-    const dy = goal.y - position.center.y;
-    
-    let forceX = dx > 0 ? 1.0 : -1.0;
-    let forceY = 0;
-    
-    // Jump if goal is above or if we need to clear obstacles
-    if (isGrounded && (dy > 2 || velocity.x < 0.1)) {
-        forceY = 1.0;
+  if (Object.keys(memory).length === 0 ) {
+    const NULLPOSC = { x: -1.0, y: -1.0 }
+    const NULLPOS = {
+      center: NULLPOSC, bottomRight: NULLPOSC, bottomLeft: NULLPOSC,
+      topRight: NULLPOSC, topLeft: NULLPOSC
     }
-    
-    return { forceX, forceY, memory };
+    memory = { lastPos: Array(5).fill(NULLPOS) }
+  }
+
+  let forceX = 0.0
+  if (levelData.endPos.x > position.bottomRight.x) {
+    forceX = 1.0
+  } else {
+    forceX = -1.0
+  }
+
+  let forceY = 0.0
+  if (forceX > 0.0) {
+    if (safeAccessGrid(levelData, position.bottomRight.x, position.bottomRight.y - 1) === "air") {
+      forceY = Math.random(0.8, 1.0)
+    }
+  } else {
+    if (safeAccessGrid(levelData, position.bottomLeft.x, position.bottomLeft.y - 1) === "air") {
+      forceY = Math.random(0.8, 1.0)
+    }
+  }
+  console.log(memory)
+  if (dist(memory.lastPos[0].center, position.center) < 1.0 || Math.abs(memory.lastPos[0].center.y - position.center.y) < 1.0) {
+    forceY = Math.random(0.9, 1.0)
+  }
+  
+  return {
+    forceX, forceY, memory: { lastPos: [...memory.lastPos.slice(1), position] }
+  };
 }
 ```
 
@@ -115,3 +144,4 @@ function ai(levelData, position, memory, isGrounded, velocity, tick, elapsedTime
 - `levels.js` - Level definitions and parser
 
 Enjoy coding your AI!
+
