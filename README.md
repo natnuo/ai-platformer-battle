@@ -7,7 +7,7 @@ A multiplayer AI programming game where two players write JavaScript code to con
 1. Open `index.html` in a web browser
 2. Each player writes their AI code in their respective code editor
 3. Click "START BATTLE" to begin the race
-4. Watch your AIs compete to finish all 10 levels first!
+4. Watch your AIs compete to finish all 5 levels first!
 
 ## AI Interface
 
@@ -49,7 +49,7 @@ function ai(levelData, position, memory, isGrounded, velocity, tick, elapsedTime
 - **AI Timeout**: 100ms - if your AI takes longer, that tick is skipped
 - **Lava**: Touching lava resets you to the start of the level
 - **Goal**: Touch the goal to advance to the next level
-- **Winning**: First to complete all 10 levels wins. If one player finishes, the other has 10 seconds to catch up.
+- **Winning**: First to complete all 5 levels wins. If one player finishes, the other has 10 seconds to catch up.
 
 ## Physics
 
